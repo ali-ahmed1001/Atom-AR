@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Enhanced Oxygen Atom AR</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+
+      body {
+        background: #0a1929;
+        color: white;
+        height: 100vh;
+        overflow: hidden;
+        font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      }
+
+      .container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .ar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #001e3c 0%, #000a1c 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        text-align: center;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 247, 255, 0.2);
+      }
+
+      .logo {
+        font-size: 3.5rem;
+        margin-bottom: 15px;
+        color: #00f7ff;
+        text-shadow: 0 0 20px rgba(0, 247, 255, 0.8);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          text-shadow: 0 0 15px rgba(0, 247, 255, 0.7);
+        }
+        50% {
+          text-shadow: 0 0 30px rgba(0, 247, 255, 1);
+        }
+        100% {
+          text-shadow: 0 0 15px rgba(0, 247, 255, 0.7);
+        }
+      }
+
+      .title {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(to right, #00f7ff, #00c3ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+        letter-spacing: 1px;
+      }
+
+      .subtitle {
+        font-size: 1.2rem;
+        opacity: 0.85;
+        max-width: 500px;
+        margin-bottom: 30px;
+        line-height: 1.6;
+        color: #a0d2ff;
+      }
+
+      .marker-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 25px 0;
+      }
+
+      .marker-preview {
+        width: 220px;
+        height: 220px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        box-shadow: 0 0 30px rgba(0, 199, 255, 0.7);
+        border: 3px solid #00f7ff;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .marker-preview::before {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          circle,
+          transparent 60%,
+          rgba(0, 247, 255, 0.3) 100%
+        );
+      }
+
+      .marker-preview img {
+        width: 80%;
+        filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+      }
+
+      .btn {
+        background: linear-gradient(to right, #0072ff, #00c6ff);
+        color: white;
+        border: none;
+        padding: 18px 45px;
+        font-size: 1.3rem;
+        border-radius: 50px;
+        cursor: pointer;
+        margin: 15px 0;
+        font-weight: bold;
+        letter-spacing: 1px;
+        box-shadow: 0 5px 25px rgba(0, 114, 255, 0.6);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0, 114, 255, 0.8);
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .btn i {
+        margin-right: 12px;
+      }
+
+      .instructions {
+        background: rgba(0, 40, 80, 0.4);
+        border-radius: 15px;
+        padding: 25px;
+        margin-top: 20px;
+        max-width: 500px;
+        border: 1px solid rgba(0, 199, 255, 0.4);
+        backdrop-filter: blur(5px);
+      }
+
+      .instructions h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #00f7ff;
+        text-align: center;
+      }
+
+      .steps {
+        list-style-type: none;
+        counter-reset: step-counter;
+        text-align: left;
+      }
+
+      .steps li {
+        margin-bottom: 15px;
+        padding-left: 40px;
+        position: relative;
+        line-height: 1.6;
+        color: #cae6ff;
+      }
+
+      .steps li:before {
+        counter-increment: step-counter;
+        content: counter(step-counter);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 30px;
+        height: 30px;
+        background: #00f7ff;
+        color: #001428;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+
+      .status-bar {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        z-index: 90;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 15px;
+        font-size: 1.1rem;
+        backdrop-filter: blur(5px);
+        border-bottom: 2px solid #00f7ff;
+        transition: opacity 0.5s ease;
+        color: #00f7ff;
+        font-weight: 500;
+      }
+
+      .controls {
+        position: absolute;
+        bottom: 30px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        z-index: 90;
+      }
+
+      .control-btn {
+        background: rgba(0, 40, 80, 0.7);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 65px;
+        height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.6rem;
+        backdrop-filter: blur(5px);
+        border: 2px solid #00f7ff;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(0, 247, 255, 0.3);
+      }
+
+      .control-btn:hover {
+        background: rgba(0, 114, 255, 0.7);
+        transform: scale(1.1);
+      }
+
+      .atom-info {
+        position: absolute;
+        bottom: 120px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        z-index: 90;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 15px;
+        font-size: 1.1rem;
+        backdrop-filter: blur(5px);
+        border-top: 2px solid #00f7ff;
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        transition: transform 0.5s ease;
+      }
+
+      .atom-info.hidden {
+        transform: translateY(150px);
+      }
+
+      .electron-type {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px 15px;
+        background: rgba(0, 40, 80, 0.4);
+        border-radius: 10px;
+        min-width: 120px;
+      }
+
+      .electron-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-top: 8px;
+        box-shadow: 0 0 8px currentColor;
+      }
+
+      .s-color {
+        background: #00ffaa;
+        color: #00ffaa;
+      }
+      .p-color {
+        background: #d66efd;
+        color: #d66efd;
+      }
+
+      .ar-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .scale-controls {
+        position: absolute;
+        bottom: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 30, 60, 0.8);
+        padding: 15px 25px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        z-index: 95;
+        border: 1px solid #00c3ff;
+        backdrop-filter: blur(5px);
+      }
+
+      .scale-controls label {
+        color: #00f7ff;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .scale-slider {
+        width: 200px;
+        -webkit-appearance: none;
+        height: 10px;
+        border-radius: 5px;
+        background: linear-gradient(to right, #0072ff, #00c6ff);
+        outline: none;
+      }
+
+      .scale-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background: #00f7ff;
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(0, 247, 255, 0.8);
+      }
+
+      .atom-scale-value {
+        width: 40px;
+        text-align: center;
+        font-weight: bold;
+        color: #00f7ff;
+      }
+
+      .orbit-toggle {
+        position: absolute;
+        bottom: 120px;
+        right: 20px;
+        background: rgba(0, 40, 80, 0.7);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 65px;
+        height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.6rem;
+        backdrop-filter: blur(5px);
+        border: 2px solid #00f7ff;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(0, 247, 255, 0.3);
+        z-index: 95;
+      }
+
+      .orbit-toggle:hover {
+        background: rgba(0, 114, 255, 0.7);
+        transform: scale(1.1);
+      }
+
+      /* iPhone XR specific media query */
+      @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+        .title {
+          font-size: 2rem;
+        }
+
+        .subtitle {
+          font-size: 1rem;
+          padding: 0 20px;
+        }
+
+        .marker-preview {
+          width: 190px;
+          height: 190px;
+        }
+
+        .btn {
+          padding: 16px 35px;
+          font-size: 1.1rem;
+        }
+
+        .instructions {
+          padding: 15px;
+          margin: 15px;
+        }
+
+        .steps li {
+          font-size: 0.9rem;
+          padding-left: 35px;
+        }
+
+        .steps li:before {
+          width: 25px;
+          height: 25px;
+          font-size: 0.9rem;
+        }
+
+        .atom-info {
+          bottom: 110px;
+          gap: 20px;
+          font-size: 0.9rem;
+        }
+
+        .control-btn {
+          width: 55px;
+          height: 55px;
+          font-size: 1.4rem;
+        }
+
+        .scale-controls {
+          bottom: 110px;
+          padding: 12px 20px;
+        }
+
+        .scale-slider {
+          width: 150px;
+        }
+
+        .orbit-toggle {
+          bottom: 110px;
+          width: 55px;
+          height: 55px;
+          font-size: 1.4rem;
+        }
+      }
+
+      /* Animation enhancements */
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      .floating {
+        animation: float 4s ease-in-out infinite;
+      }
+
+      /* Electron glow effect */
+      .electron-glow {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        filter: blur(5px);
+        z-index: -1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="ar-overlay" id="overlay">
+        <div class="logo floating">
+          <i class="fas fa-atom"></i>
+        </div>
+        <h1 class="title">Enhanced Oxygen Atom AR</h1>
+        <p class="subtitle">
+          Explore the quantum structure of oxygen with accurately orbiting
+          electrons
+        </p>
+
+        <div class="marker-container">
+          <div class="marker-preview">
+            <img
+              src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png"
+              alt="Hiro Marker"
+            />
+          </div>
+          <p>Point your camera at this Hiro marker</p>
+        </div>
+
+        <button class="btn" id="startBtn">
+          <i class="fas fa-play"></i> Start AR Experience
+        </button>
+
+        <div class="instructions">
+          <h3>How to Use</h3>
+          <ol class="steps">
+            <li>Allow camera access when prompted</li>
+            <li>Print the Hiro marker or display it on another device</li>
+            <li>Point your camera at the marker in a well-lit area</li>
+            <li>Use the slider to adjust the atom size</li>
+            <li>Toggle electron info and animation speed</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="status-bar" id="statusBar">
+        <i class="fas fa-search"></i> Searching for Hiro marker... Point your
+        camera at the marker
+      </div>
+
+      <div class="atom-info" id="atomInfo">
+        <div class="electron-type">
+          <span>1s² Orbit</span>
+          <div class="electron-color s-color"></div>
+        </div>
+        <div class="electron-type">
+          <span>2s² Orbit</span>
+          <div class="electron-color s-color"></div>
+        </div>
+        <div class="electron-type">
+          <span>2p⁴ Orbit</span>
+          <div class="electron-color p-color"></div>
+        </div>
+      </div>
+
+      <div class="scale-controls" id="scaleControls">
+        <label for="scaleSlider">Atom Size:</label>
+        <input
+          type="range"
+          id="scaleSlider"
+          class="scale-slider"
+          min="0.5"
+          max="1.5"
+          step="0.1"
+          value="1"
+        />
+        <span class="atom-scale-value" id="scaleValue">1.0</span>
+      </div>
+
+      <button
+        class="orbit-toggle"
+        id="orbitToggle"
+        title="Toggle orbit visibility"
+      >
+        <i class="fas fa-circle"></i>
+      </button>
+
+      <div class="controls">
+        <button
+          class="control-btn"
+          id="speedBtn"
+          title="Toggle animation speed"
+        >
+          <i class="fas fa-bolt"></i>
+        </button>
+        <button class="control-btn" id="infoBtn" title="Toggle electron info">
+          <i class="fas fa-info"></i>
+        </button>
+        <button class="control-btn" id="helpBtn" title="Show instructions">
+          <i class="fas fa-question"></i>
+        </button>
+      </div>
+
+      <div class="ar-container" id="arContainer">
+        <a-scene
+          embedded
+          arjs="sourceType: webcam; detectionMode: mono; maxDetectionRate: 60; debugUIEnabled: false;"
+        >
+          <a-marker type="pattern" preset="hiro">
+            <!-- Entire atom model for scaling -->
+            <a-entity id="atom-model" scale="1 1 1">
+              <!-- Nucleus - single large sphere -->
+              <a-entity id="nucleus" position="0 0 0">
+                <a-sphere color="#FF3B30" radius="0.5" position="0 0 0">
+                  <a-text
+                    value="8p⁺"
+                    color="white"
+                    align="center"
+                    position="0 0 0.51"
+                    scale="0.4 0.4 0.4"
+                  ></a-text>
+                </a-sphere>
+                <a-sphere color="#FF9500" radius="0.5" position="0.2 0.15 0.15">
+                  <a-text
+                    value="8n⁰"
+                    color="white"
+                    align="center"
+                    position="0 0 0.51"
+                    scale="0.4 0.4 0.4"
+                  ></a-text>
+                </a-sphere>
+              </a-entity>
+
+              <!-- Orbit lines (horizontal orientation) -->
+              <a-ring
+                id="orbit1"
+                color="#00ffaa"
+                radius-inner="0.8"
+                radius-outer="0.82"
+                position="0 0 0"
+                rotation="90 0 0"
+                opacity="0.5"
+              ></a-ring>
+              <a-ring
+                id="orbit2"
+                color="#00ffaa"
+                radius-inner="1.4"
+                radius-outer="1.42"
+                position="0 0 0"
+                rotation="90 0 0"
+                opacity="0.5"
+              ></a-ring>
+              <a-ring
+                id="orbit3"
+                color="#d66efd"
+                radius-inner="2.0"
+                radius-outer="2.02"
+                position="0 0 0"
+                rotation="90 0 0"
+                opacity="0.5"
+              ></a-ring>
+
+              <!-- Inner Orbit (2 electrons) - 1s² -->
+              <a-entity id="inner-orbit" position="0 0 0">
+                <a-animation
+                  attribute="rotation"
+                  from="0 0 0"
+                  to="0 360 0"
+                  dur="5000"
+                  repeat="indefinite"
+                  easing="linear"
+                ></a-animation>
+
+                <!-- Electrons positioned on the orbit line -->
+                <a-sphere
+                  class="electron"
+                  color="#00ffaa"
+                  radius="0.1"
+                  position="0.8 0 0"
+                >
+                  <a-text
+                    value="e⁻"
+                    color="white"
+                    align="center"
+                    position="0 0 0.11"
+                    scale="0.25 0.25 0.25"
+                  ></a-text>
+                </a-sphere>
+                <a-sphere
+                  class="electron"
+                  color="#00ffaa"
+                  radius="0.1"
+                  position="-0.8 0 0"
+                >
+                  <a-text
+                    value="e⁻"
+                    color="white"
+                    align="center"
+                    position="0 0 0.11"
+                    scale="0.25 0.25 0.25"
+                  ></a-text>
+                </a-sphere>
+              </a-entity>
+
+              <!-- Middle Orbit (2 electrons) - 2s² -->
+              <a-entity id="middle-orbit" position="0 0 0">
+                <a-animation
+                  attribute="rotation"
+                  from="0 0 0"
+                  to="0 360 0"
+                  dur="8000"
+                  repeat="indefinite"
+                  easing="linear"
+                ></a-animation>
+
+                <!-- Electrons positioned on the orbit line -->
+                <a-sphere
+                  class="electron"
+                  color="#00ffaa"
+                  radius="0.1"
+                  position="1.4 0 0"
+                >
+                  <a-text
+                    value="e⁻"
+                    color="white"
+                    align="center"
+                    position="0 0 0.11"
+                    scale="0.25 0.25 0.25"
+                  ></a-text>
+                </a-sphere>
+                <a-sphere
+                  class="electron"
+                  color="#00ffaa"
+                  radius="0.1"
+                  position="-1.4 0 0"
+                >
+                  <a-text
+                    value="e⁻"
+                    color="white"
+                    align="center"
+                    position="0 0 0.11"
+                    scale="0.25 0.25 0.25"
+                  ></a-text>
+                </a-sphere>
+              </a-entity>
+
+              <!-- Outer Orbit (4 electrons) - 2p⁴ -->
+              <a-entity id="outer-orbit" position="0 0 0">
+                <a-animation
+                  attribute="rotation"
+                  from="0 0 0"
+                  to="0 360 0"
+                  dur="12000"
+                  repeat="indefinite"
+                  easing="linear"
+                ></a-animation>
+
+                <!-- Electrons positioned on the orbit line -->
+                <a-sphere
+                  class="electron"
+                  color="#d66efd"
+                  radius="0.1"
+                  position="2.0 0 0"
+                >
+                  <a-text
+                    value="e⁻"
+                    color="white"
+                    align="center"
+                    position="0 0 0.11"
+                    scale="0.25 0.25 0.25"
+                  ></a-text>
+                </a-sphere>
+                <a-sphere
+                  class="electron"
+                  color="#d66efd"
+                  radius="0.1"
+                  position="-2.0 0 0"
+                >
+                  <a-text
+                    value="e⁻"
+                    color="white"
+                    align="center"
+                    position="0 0 0.11"
+                    scale="0.25 0.25 0.25"
+                  ></a-text>
+                </a-sphere>
+                <a-sphere
+                  class="electron"
+                  color="#d66efd"
+                  radius="0.1"
+                  position="0 0 2.0"
+                >
+                  <a-text
+                    value="e⁻"
+                    color="white"
+                    align="center"
+                    position="0 0 0.11"
+                    scale="0.25 0.25 0.25"
+                  ></a-text>
+                </a-sphere>
+                <a-sphere
+                  class="electron"
+                  color="#d66efd"
+                  radius="0.1"
+                  position="0 0 -2.0"
+                >
+                  <a-text
+                    value="e⁻"
+                    color="white"
+                    align="center"
+                    position="0 0 0.11"
+                    scale="0.25 0.25 0.25"
+                  ></a-text>
+                </a-sphere>
+              </a-entity>
+
+              <!-- Atom label -->
+              <a-text
+                value="Oxygen Atom"
+                color="#00f7ff"
+                align="center"
+                position="0 2.5 0"
+                scale="1.8 1.8 1.8"
+              ></a-text>
+            </a-entity>
+          </a-marker>
+          <a-entity camera></a-entity>
+        </a-scene>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const overlay = document.getElementById("overlay");
+        const startBtn = document.getElementById("startBtn");
+        const statusBar = document.getElementById("statusBar");
+        const atomInfo = document.getElementById("atomInfo");
+        const speedBtn = document.getElementById("speedBtn");
+        const infoBtn = document.getElementById("infoBtn");
+        const helpBtn = document.getElementById("helpBtn");
+        const scaleSlider = document.getElementById("scaleSlider");
+        const scaleValue = document.getElementById("scaleValue");
+        const scaleControls = document.getElementById("scaleControls");
+        const orbitToggle = document.getElementById("orbitToggle");
+
+        // Start AR experience
+        startBtn.addEventListener("click", () => {
+          overlay.style.display = "none";
+          statusBar.style.display = "block";
+          scaleControls.style.display = "flex";
+          orbitToggle.style.display = "flex";
+        });
+
+        // Toggle electron info
+        infoBtn.addEventListener("click", () => {
+          atomInfo.classList.toggle("hidden");
+        });
+
+        // Show help overlay
+        helpBtn.addEventListener("click", () => {
+          overlay.style.display = "flex";
+          statusBar.style.display = "none";
+          scaleControls.style.display = "none";
+          orbitToggle.style.display = "none";
+        });
+
+        // Toggle animation speed
+        let fastMode = false;
+        speedBtn.addEventListener("click", () => {
+          fastMode = !fastMode;
+
+          const orbits = ["inner-orbit", "middle-orbit", "outer-orbit"];
+          const durations = fastMode ? [2000, 4000, 6000] : [5000, 8000, 12000];
+
+          orbits.forEach((id, index) => {
+            const orbit = document.getElementById(id);
+            const animation = orbit.querySelector("a-animation");
+            animation.setAttribute("dur", durations[index]);
+          });
+
+          if (fastMode) {
+            speedBtn.style.background = "rgba(255, 204, 0, 0.7)";
+            speedBtn.style.borderColor = "#FF9500";
+          } else {
+            speedBtn.style.background = "rgba(0, 40, 80, 0.7)";
+            speedBtn.style.borderColor = "#00f7ff";
+          }
+        });
+
+        // Atom scaling
+        scaleSlider.addEventListener("input", () => {
+          const scale = scaleSlider.value;
+          scaleValue.textContent = scale;
+
+          const atomModel = document.querySelector("#atom-model");
+          if (atomModel) {
+            atomModel.setAttribute("scale", `${scale} ${scale} ${scale}`);
+          }
+        });
+
+        // Orbit visibility toggle
+        orbitToggle.addEventListener("click", () => {
+          const orbitIds = ["orbit1", "orbit2", "orbit3"];
+          let allVisible = true;
+
+          orbitIds.forEach((id) => {
+            const orbit = document.getElementById(id);
+            if (orbit) {
+              const visible = orbit.getAttribute("visible");
+              if (visible !== false) {
+                orbit.setAttribute("visible", false);
+                allVisible = false;
+              } else {
+                orbit.setAttribute("visible", true);
+              }
+            }
+          });
+
+          if (allVisible) {
+            orbitToggle.style.background = "rgba(100, 40, 180, 0.7)";
+            orbitToggle.style.borderColor = "#d66efd";
+          } else {
+            orbitToggle.style.background = "rgba(0, 40, 80, 0.7)";
+            orbitToggle.style.borderColor = "#00f7ff";
+          }
+        });
+
+        // Hide status bar after 5 seconds when marker is found
+        setTimeout(() => {
+          statusBar.style.opacity = "0";
+          setTimeout(() => {
+            statusBar.style.display = "none";
+          }, 1000);
+        }, 5000);
+
+        // Initially hide scale controls and orbit toggle
+        scaleControls.style.display = "none";
+        orbitToggle.style.display = "none";
+
+        // Add glow effects to electrons after scene loads
+        setTimeout(() => {
+          const electrons = document.querySelectorAll(".electron");
+          electrons.forEach((electron) => {
+            const color = electron.getAttribute("color");
+            const position = electron.getAttribute("position");
+
+            const glow = document.createElement("a-sphere");
+            glow.setAttribute("color", color);
+            glow.setAttribute("radius", "0.15");
+            glow.setAttribute("position", position);
+            glow.setAttribute("opacity", "0.5");
+
+            electron.parentNode.appendChild(glow);
+          });
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>
