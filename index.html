@@ -11,57 +11,60 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             color: white;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
             overflow-x: hidden;
         }
         
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 800px;
+            width: 100%;
             padding: 20px;
         }
         
         header {
-            text-align: center;
-            padding: 30px 0;
+            margin-bottom: 40px;
+            padding: 20px;
+            border-radius: 20px;
             background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            margin-bottom: 30px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
         h1 {
-            font-size: 3.5rem;
+            font-size: 3rem;
             margin-bottom: 15px;
-            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
         .subtitle {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             max-width: 700px;
             margin: 0 auto;
             color: #e0e0e0;
+            line-height: 1.6;
         }
         
         .content {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 30px;
             margin-bottom: 40px;
         }
         
         .instructions {
-            flex: 1;
-            min-width: 300px;
             background: rgba(0, 0, 0, 0.3);
             padding: 25px;
             border-radius: 15px;
@@ -69,9 +72,9 @@
         }
         
         .instructions h2 {
-            color: #4fc3f7;
+            color: #00c6ff;
             margin-bottom: 20px;
-            border-bottom: 2px solid #4fc3f7;
+            border-bottom: 2px solid #00c6ff;
             padding-bottom: 10px;
         }
         
@@ -79,15 +82,22 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
         }
         
         .step {
             display: flex;
             gap: 15px;
+            align-items: center;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
         }
         
         .step-number {
-            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
             color: white;
             width: 40px;
             height: 40px;
@@ -102,7 +112,7 @@
         
         .step-content h3 {
             margin-bottom: 8px;
-            color: #81d4fa;
+            color: #00c6ff;
         }
         
         .step-content p {
@@ -111,8 +121,6 @@
         }
         
         .target-image {
-            flex: 1;
-            min-width: 300px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -120,12 +128,13 @@
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            margin: 20px 0;
         }
         
         .target-image h2 {
-            color: #4fc3f7;
+            color: #00c6ff;
             margin-bottom: 20px;
-            border-bottom: 2px solid #4fc3f7;
+            border-bottom: 2px solid #00c6ff;
             padding-bottom: 10px;
             text-align: center;
             width: 100%;
@@ -137,6 +146,7 @@
             border-radius: 10px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             margin-bottom: 20px;
+            max-width: 300px;
         }
         
         .target-img-container img {
@@ -163,7 +173,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -177,7 +187,7 @@
             height: 60px;
             border: 6px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top: 6px solid #4fc3f7;
+            border-top: 6px solid #00c6ff;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
         }
@@ -188,57 +198,52 @@
         }
         
         .arjs-loader h2 {
-            color: #4fc3f7;
+            color: #00c6ff;
             margin-bottom: 10px;
         }
         
         .atom-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        
-        .atom-structure {
-            flex: 1;
-            min-width: 300px;
             background: rgba(0, 0, 0, 0.3);
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
         }
         
-        .atom-structure h2 {
-            color: #4fc3f7;
+        .atom-info h2 {
+            color: #00c6ff;
             margin-bottom: 20px;
-            border-bottom: 2px solid #4fc3f7;
+            border-bottom: 2px solid #00c6ff;
             padding-bottom: 10px;
         }
         
         .structure-list {
             list-style-type: none;
-        }
-        
-        .structure-list li {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
-            align-items: center;
-            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
         }
         
-        .structure-list li:last-child {
-            border-bottom: none;
+        .structure-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         .structure-icon {
-            width: 30px;
-            height: 30px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
+            margin-bottom: 15px;
+            font-size: 24px;
         }
         
         .nucleus-icon {
@@ -259,10 +264,11 @@
             background: rgba(0, 0, 0, 0.4);
             border-radius: 15px;
             margin-top: 20px;
+            width: 100%;
         }
         
         .start-button {
-            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
             color: white;
             border: none;
             padding: 15px 40px;
@@ -271,7 +277,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            margin-top: 20px;
+            margin: 20px 0;
             font-weight: bold;
         }
         
@@ -280,17 +286,19 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
         
+        .demo-text {
+            margin-top: 30px;
+            font-style: italic;
+            color: #aaa;
+        }
+        
         @media (max-width: 768px) {
-            .content {
-                flex-direction: column;
-            }
-            
             h1 {
-                font-size: 2.5rem;
+                font-size: 2.2rem;
             }
             
             .subtitle {
-                font-size: 1.2rem;
+                font-size: 1rem;
             }
             
             .ar-container {
@@ -303,39 +311,39 @@
     <div class="container">
         <header>
             <h1>Hydrogen Atom AR Experience</h1>
-            <p class="subtitle">Scan the target image to visualize a hydrogen atom with orbiting electron in augmented reality</p>
+            <p class="subtitle">Scan the target image below with your camera to view a hydrogen atom in augmented reality</p>
         </header>
         
         <div class="content">
             <div class="instructions">
-                <h2>How to Use This AR Experience</h2>
+                <h2>How to Activate the AR Experience</h2>
                 <div class="steps">
                     <div class="step">
                         <div class="step-number">1</div>
                         <div class="step-content">
-                            <h3>Prepare the Target Image</h3>
-                            <p>Print the target image or display it on another device. Make sure it's clearly visible.</p>
+                            <h3>View the Target Image</h3>
+                            <p>Display this target image on your screen or print it out.</p>
                         </div>
                     </div>
                     <div class="step">
                         <div class="step-number">2</div>
                         <div class="step-content">
-                            <h3>Start the AR Experience</h3>
-                            <p>Click the "Start AR Experience" button below to activate your camera.</p>
+                            <h3>Open Your Camera App</h3>
+                            <p>On your smartphone, open your native camera application.</p>
                         </div>
                     </div>
                     <div class="step">
                         <div class="step-number">3</div>
                         <div class="step-content">
                             <h3>Scan the Image</h3>
-                            <p>Point your device's camera at the target image. Make sure the entire image is visible in your camera view.</p>
+                            <p>Point your camera at the target image as if scanning a QR code.</p>
                         </div>
                     </div>
                     <div class="step">
                         <div class="step-number">4</div>
                         <div class="step-content">
-                            <h3>Explore the Atom</h3>
-                            <p>Once detected, you'll see a hydrogen atom appear above the target image. Move around to view it from different angles.</p>
+                            <h3>View the AR Experience</h3>
+                            <p>When prompted, open the AR experience to see the hydrogen atom.</p>
                         </div>
                     </div>
                 </div>
@@ -346,36 +354,33 @@
                 <div class="target-img-container">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Hiro_marker_ARjs.png/640px-Hiro_marker_ARjs.png" alt="AR Target Image">
                 </div>
-                <p>Point your camera at this image to activate the AR experience</p>
+                <p>Scan this image with your camera to activate the AR experience</p>
             </div>
-        </div>
-        
-        <div class="atom-info">
-            <div class="atom-structure">
-                <h2>Hydrogen Atom Structure</h2>
+            
+            <button class="start-button" id="startButton">Launch AR Experience</button>
+            
+            <div class="atom-info">
+                <h2>Hydrogen Atom Features</h2>
                 <ul class="structure-list">
-                    <li>
-                        <div class="structure-icon nucleus-icon"></div>
+                    <li class="structure-item">
+                        <div class="structure-icon nucleus-icon">+</div>
                         <div>
-                            <strong>Nucleus:</strong> Single proton shown as a blue sphere at the center
+                            <strong>Nucleus</strong>
+                            <p>Single proton center</p>
                         </div>
                     </li>
-                    <li>
-                        <div class="structure-icon electron-icon"></div>
+                    <li class="structure-item">
+                        <div class="structure-icon electron-icon">-</div>
                         <div>
-                            <strong>Electron:</strong> Red sphere orbiting around the nucleus
+                            <strong>Electron</strong>
+                            <p>Orbiting particle</p>
                         </div>
                     </li>
-                    <li>
-                        <div class="structure-icon orbit-icon"></div>
+                    <li class="structure-item">
+                        <div class="structure-icon orbit-icon">○</div>
                         <div>
-                            <strong>Orbital Path:</strong> White circular path that the electron follows
-                        </div>
-                    </li>
-                    <li>
-                        <div class="structure-icon" style="background: #9C27B0;">→</div>
-                        <div>
-                            <strong>Real-time Animation:</strong> Electron orbits the nucleus at a constant speed
+                            <strong>Orbital Path</strong>
+                            <p>Electron trajectory</p>
                         </div>
                     </li>
                 </ul>
@@ -385,7 +390,7 @@
                 <div class="arjs-loader">
                     <div class="loading-spinner"></div>
                     <h2>Loading AR Experience</h2>
-                    <p>Camera access required - please allow when prompted</p>
+                    <p>Point your camera at the target image</p>
                 </div>
                 
                 <a-scene 
@@ -393,6 +398,8 @@
                     arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono;"
                     renderer="logarithmicDepthBuffer: true; precision: medium;"
                     embedded
+                    id="arScene"
+                    style="display: none;"
                 >
                     <a-assets>
                         <a-mixin id="nucleus" geometry="primitive: sphere; radius: 0.15" 
@@ -429,8 +436,8 @@
         </div>
         
         <footer>
-            <button class="start-button" id="startButton">Start AR Experience</button>
-            <p>Point your camera at the target image to view the hydrogen atom in augmented reality</p>
+            <p>Hydrogen Atom AR Experience | Created with AR.js and A-Frame</p>
+            <p class="demo-text">Note: This is a demo experience. For best results, use on a mobile device.</p>
         </footer>
     </div>
 
@@ -447,18 +454,35 @@
         
         // Start AR experience button
         document.getElementById('startButton').addEventListener('click', function() {
+            // Show loading screen
+            document.querySelector('.arjs-loader').style.display = 'flex';
+            document.querySelector('.arjs-loader').style.opacity = '1';
+            
+            // Show the AR scene
+            document.getElementById('arScene').style.display = 'block';
+            
             // Request camera access
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(function(stream) {
                     // Camera access granted
-                    document.querySelector('.arjs-loader').style.display = 'flex';
-                    document.querySelector('.arjs-loader').style.opacity = '1';
+                    console.log('Camera access granted');
                 })
                 .catch(function(err) {
                     alert('Camera access is required for this AR experience. Please enable camera permissions.');
                     console.error('Camera access error:', err);
                 });
         });
+        
+        // Check if we're on a mobile device
+        function isMobileDevice() {
+            return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+        }
+        
+        // Show mobile-specific instructions if needed
+        if (isMobileDevice()) {
+            document.querySelector('.step:nth-child(2) .step-content p').innerHTML = 
+                'On your smartphone, open your native camera application.';
+        }
     </script>
 </body>
 </html>
