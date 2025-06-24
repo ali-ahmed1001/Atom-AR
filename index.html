@@ -1,317 +1,467 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hydrogen Atom AR Experience</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydrogen Atom AR Visualization</title>
     <script src="https://cdn.jsdelivr.net/npm/ar.js@1.6.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        color: white;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .container {
-        position: relative;
-        width: 100%;
-        height: 100%;
-      }
-
-      #arScene {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
-
-      .header {
-        text-align: center;
-        padding: 15px;
-        background: rgba(0, 0, 30, 0.7);
-        z-index: 10;
-        position: relative;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: 1.8rem;
-        text-shadow: 0 0 10px rgba(0, 200, 255, 0.7);
-        letter-spacing: 1.5px;
-      }
-
-      .instructions {
-        background: rgba(0, 0, 40, 0.85);
-        padding: 20px;
-        border-radius: 10px;
-        max-width: 500px;
-        margin: 20px auto;
-        position: relative;
-        z-index: 10;
-        box-shadow: 0 0 20px rgba(0, 200, 255, 0.5);
-        border: 1px solid #00c8ff;
-      }
-
-      .instructions h2 {
-        color: #00c8ff;
-        margin-top: 0;
-        text-align: center;
-      }
-
-      .instructions ol {
-        padding-left: 20px;
-      }
-
-      .instructions li {
-        margin-bottom: 10px;
-        line-height: 1.5;
-      }
-
-      .marker {
-        display: flex;
-        justify-content: center;
-        margin: 10px 0;
-      }
-
-      .marker img {
-        width: 150px;
-        border: 2px solid #00c8ff;
-        border-radius: 5px;
-        box-shadow: 0 0 15px rgba(0, 200, 255, 0.7);
-      }
-
-      .footer {
-        text-align: center;
-        padding: 10px;
-        background: rgba(0, 0, 30, 0.7);
-        font-size: 0.9rem;
-        position: relative;
-        z-index: 10;
-      }
-
-      .atom-info {
-        background: rgba(0, 40, 60, 0.8);
-        padding: 15px;
-        border-radius: 10px;
-        margin-top: 15px;
-        border: 1px solid #00c8ff;
-      }
-
-      @media (max-width: 600px) {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 20, 40, 0.7);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+        
         h1 {
-          font-size: 1.4rem;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(79, 172, 254, 0.3);
         }
-
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+        }
+        
         .instructions {
-          padding: 15px;
-          margin: 10px;
+            background: rgba(0, 15, 30, 0.85);
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 500px;
+            box-shadow: 0 0 30px rgba(0, 150, 255, 0.3);
+            border: 1px solid rgba(0, 200, 255, 0.5);
+            backdrop-filter: blur(5px);
+            height: fit-content;
         }
-
-        .marker img {
-          width: 120px;
+        
+        .instructions h2 {
+            color: #4facfe;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
         }
-      }
+        
+        .step {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(79, 172, 254, 0.3);
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .step h3 {
+            display: flex;
+            align-items: center;
+            color: #00f2fe;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .step-number {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .marker-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .marker-label {
+            margin-bottom: 10px;
+            color: #00f2fe;
+        }
+        
+        .marker {
+            width: 200px;
+            height: 200px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
+        }
+        
+        .marker-image {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #000, #333);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid #4facfe;
+        }
+        
+        .ar-container {
+            flex: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        
+        #arScene {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .permission-prompt {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 20, 40, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            z-index: 20;
+            backdrop-filter: blur(5px);
+        }
+        
+        .permission-prompt h2 {
+            color: #00f2fe;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .permission-prompt p {
+            max-width: 600px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: #0f2027;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 20, 40, 0.7);
+            font-size: 1rem;
+        }
+        
+        .atom-info {
+            background: rgba(0, 40, 60, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px solid rgba(0, 200, 255, 0.3);
+        }
+        
+        .atom-info h3 {
+            color: #00f2fe;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .instructions {
+                max-width: 100%;
+                width: 100%;
+            }
+            
+            .ar-container {
+                width: 100%;
+                height: 400px;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
+    <div class="header">
+        <h1>Hydrogen Atom AR Visualization</h1>
+        <p class="subtitle">Explore the simplest atom in the universe using augmented reality</p>
+    </div>
+    
     <div class="container">
-      <div class="header">
-        <h1>Hydrogen Atom AR Experience</h1>
-      </div>
-
-      <div class="instructions">
-        <h2>How to Use This Experience</h2>
-        <ol>
-          <li>Print or display the Hiro marker on another device</li>
-          <li>Allow camera access when prompted</li>
-          <li>Point your camera at the Hiro marker</li>
-          <li>View the hydrogen atom in augmented reality</li>
-          <li>Move around to see the atom from different angles</li>
-        </ol>
-
-        <div class="marker">
-          <img
-            src="https://arjs-cors-proxy.herokuapp.com/https://raw.githubusercontent.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex-image-big.jpeg"
-            alt="Hiro Marker"
-          />
+        <div class="instructions">
+            <h2>How to Use This AR Experience</h2>
+            
+            <div class="step">
+                <h3><span class="step-number">1</span>Camera Permission</h3>
+                <p>When prompted, allow access to your camera. This is required for the AR experience to work.</p>
+            </div>
+            
+            <div class="step">
+                <h3><span class="step-number">2</span>Prepare the Marker</h3>
+                <p>Use the Hiro marker shown below. You can display it on another device or print it.</p>
+                <div class="marker-container">
+                    <div class="marker-label">Hiro Marker:</div>
+                    <div class="marker">
+                        <div class="marker-image">Hiro Marker Pattern</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step">
+                <h3><span class="step-number">3</span>View the Atom</h3>
+                <p>Point your camera at the marker to see the hydrogen atom appear in augmented reality.</p>
+            </div>
+            
+            <div class="step">
+                <h3><span class="step-number">4</span>Interact</h3>
+                <p>Move around the marker to view the atom from different angles. Observe the electron orbiting the nucleus.</p>
+            </div>
+            
+            <div class="atom-info">
+                <h3>About the Hydrogen Atom</h3>
+                <p>The hydrogen atom is the simplest and most abundant atom in the universe, consisting of:</p>
+                <ul style="padding-left: 20px; margin-top: 10px;">
+                    <li>1 proton (in nucleus)</li>
+                    <li>0 neutrons (in nucleus)</li>
+                    <li>1 electron (orbiting nucleus)</li>
+                </ul>
+            </div>
         </div>
-
-        <div class="atom-info">
-          <p>
-            <strong>Hydrogen Atom:</strong> The simplest and most abundant
-            element in the universe.
-          </p>
-          <p>
-            <strong>Composition:</strong> 1 proton and 1 electron. This model
-            combines the proton and neutron in the nucleus.
-          </p>
+        
+        <div class="ar-container">
+            <div id="arScene"></div>
+            <div class="permission-prompt" id="permissionPrompt">
+                <h2>Camera Access Required</h2>
+                <p>To experience the hydrogen atom in augmented reality, we need access to your camera. This will allow us to detect the marker and display the 3D atom model.</p>
+                <p>No images or video will be stored - the camera feed is processed in real-time and only used for AR functionality.</p>
+                <button class="btn" id="enableCamera">Enable Camera</button>
+            </div>
         </div>
-      </div>
-
-      <div id="arScene"></div>
-
-      <div class="footer">
-        <p>AR Hydrogen Atom Visualization | Using AR.js and Three.js</p>
-      </div>
+    </div>
+    
+    <div class="footer">
+        <p>AR Hydrogen Atom Visualization | Using AR.js and Three.js | Educational Experience</p>
     </div>
 
     <script>
-      // Initialize the AR scene
-      const scene = new THREE.Scene();
-      scene.background = null; // Transparent background
-
-      const camera = new THREE.PerspectiveCamera(
-        60,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        100
-      );
-
-      const renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: true,
-      });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      document.getElementById("arScene").appendChild(renderer.domElement);
-
-      // Set up AR.js context
-      const arToolkitContext = new THREEx.ArToolkitContext({
-        cameraParametersUrl:
-          "https://arjs-cors-proxy.herokuapp.com/https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/camera_para.dat",
-        detectionMode: "mono",
-      });
-
-      arToolkitContext.init(() => {
-        camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
-      });
-
-      // Set up marker tracking
-      const markerRoot = new THREE.Group();
-      scene.add(markerRoot);
-
-      const arToolkitSource = new THREEx.ArToolkitSource({
-        sourceType: "webcam",
-      });
-
-      arToolkitSource.init(() => {
-        setTimeout(() => {
-          arToolkitSource.onResizeElement();
-          arToolkitSource.copyElementSizeTo(renderer.domElement);
-        }, 2000);
-      });
-
-      // Create atom components
-      function createAtom() {
-        // Nucleus (proton and neutron combined)
-        const nucleusGeometry = new THREE.SphereGeometry(0.3, 32, 32);
-        const nucleusMaterial = new THREE.MeshPhongMaterial({
-          color: 0x1565c0,
-          emissive: 0x0d47a1,
-          specular: 0xbbdefb,
-          shininess: 50,
-          flatShading: false,
+        // Get DOM elements
+        const permissionPrompt = document.getElementById('permissionPrompt');
+        const enableCameraBtn = document.getElementById('enableCamera');
+        
+        // Initialize Three.js scene
+        const scene = new THREE.Scene();
+        scene.background = null; // Transparent background
+        
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+        
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true, 
+            alpha: true,
+            precision: 'highp'
         });
-        const nucleus = new THREE.Mesh(nucleusGeometry, nucleusMaterial);
-        markerRoot.add(nucleus);
-
-        // Electron orbit (circular path)
-        const orbitRadius = 1.5;
-        const orbitGeometry = new THREE.BufferGeometry();
-        const orbitPoints = [];
-
-        for (let i = 0; i <= 64; i++) {
-          const angle = (i / 64) * Math.PI * 2;
-          orbitPoints.push(
-            Math.cos(angle) * orbitRadius,
-            0,
-            Math.sin(angle) * orbitRadius
-          );
-        }
-
-        orbitGeometry.setAttribute(
-          "position",
-          new THREE.Float32BufferAttribute(orbitPoints, 3)
-        );
-        const orbitMaterial = new THREE.LineBasicMaterial({
-          color: 0x4fc3f7,
-          transparent: true,
-          opacity: 0.7,
-          linewidth: 2,
-        });
-        const orbit = new THREE.Line(orbitGeometry, orbitMaterial);
-        orbit.rotation.x = Math.PI / 2;
-        markerRoot.add(orbit);
-
-        // Electron
-        const electronGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-        const electronMaterial = new THREE.MeshPhongMaterial({
-          color: 0xff6d00,
-          emissive: 0xff3d00,
-          specular: 0xffccbc,
-          shininess: 50,
-        });
-        const electron = new THREE.Mesh(electronGeometry, electronMaterial);
-        electron.position.set(orbitRadius, 0, 0);
-        markerRoot.add(electron);
-
-        // Add lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-        scene.add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(1, 1, 1);
-        scene.add(directionalLight);
-
-        // Animation loop for electron
-        function animateElectron() {
-          const time = Date.now() * 0.001;
-          const speed = 1.5;
-
-          // Move electron in circular path
-          electron.position.x = Math.cos(time * speed) * orbitRadius;
-          electron.position.z = Math.sin(time * speed) * orbitRadius;
-
-          // Rotate the nucleus for visual interest
-          nucleus.rotation.y += 0.005;
-          nucleus.rotation.x += 0.002;
-
-          requestAnimationFrame(animateElectron);
-        }
-
-        animateElectron();
-      }
-
-      createAtom();
-
-      // Handle window resize
-      window.addEventListener("resize", () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        arToolkitSource.copyElementSizeTo(renderer.domElement);
-      });
-
-      // Animation loop
-      function animate() {
-        requestAnimationFrame(animate);
-
-        if (arToolkitSource.ready) {
-          arToolkitContext.update(arToolkitSource.domElement);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('arScene').appendChild(renderer.domElement);
+        
+        // AR context
+        const arToolkitContext = new THREEx.ArToolkitContext({
+            cameraParametersUrl: 'https://arjs-cors-proxy.herokuapp.com/https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
+            detectionMode: 'mono'
+        });
+        
+        // Initialize AR context
+        arToolkitContext.init(() => {
+            camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+        });
+        
+        // Create marker root
+        const markerRoot = new THREE.Group();
+        scene.add(markerRoot);
+        
+        // Marker controls
+        const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+            type: 'pattern',
+            patternUrl: 'https://arjs-cors-proxy.herokuapp.com/https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/hiro.patt'
+        });
+        
+        // Create atom function
+        function createAtom() {
+            // Nucleus (proton)
+            const nucleusGeometry = new THREE.SphereGeometry(0.4, 32, 32);
+            const nucleusMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x1565c0,
+                emissive: 0x0d47a1,
+                specular: 0xbbdefb,
+                shininess: 80,
+                flatShading: false
+            });
+            const nucleus = new THREE.Mesh(nucleusGeometry, nucleusMaterial);
+            markerRoot.add(nucleus);
+            
+            // Electron orbit (circular path)
+            const orbitRadius = 2.0;
+            const orbitGeometry = new THREE.RingGeometry(orbitRadius - 0.02, orbitRadius + 0.02, 64);
+            const orbitMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x4fc3f7,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.7
+            });
+            const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+            orbit.rotation.x = Math.PI / 2;
+            markerRoot.add(orbit);
+            
+            // Electron
+            const electronGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+            const electronMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xff6d00,
+                emissive: 0xff3d00,
+                specular: 0xffccbc,
+                shininess: 60
+            });
+            const electron = new THREE.Mesh(electronGeometry, electronMaterial);
+            electron.position.set(orbitRadius, 0, 0);
+            markerRoot.add(electron);
+            
+            // Add lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(1, 1, 0.5);
+            scene.add(directionalLight);
+            
+            const pointLight = new THREE.PointLight(0x4fc3f7, 1.5, 10);
+            pointLight.position.set(0, 0, 0);
+            markerRoot.add(pointLight);
+            
+            // Animation loop for electron
+            function animateElectron() {
+                const time = Date.now() * 0.001;
+                const speed = 1.8;
+                
+                // Move electron in circular path
+                electron.position.x = Math.cos(time * speed) * orbitRadius;
+                electron.position.z = Math.sin(time * speed) * orbitRadius;
+                
+                // Rotate the nucleus
+                nucleus.rotation.y += 0.005;
+                nucleus.rotation.x += 0.003;
+                
+                // Pulsate the electron
+                const scale = 1 + Math.sin(time * 3) * 0.1;
+                electron.scale.set(scale, scale, scale);
+                
+                requestAnimationFrame(animateElectron);
+            }
+            
+            animateElectron();
         }
-
-        renderer.render(scene, camera);
-      }
-
-      animate();
+        
+        // Camera initialization
+        function initCamera() {
+            const arToolkitSource = new THREEx.ArToolkitSource({
+                sourceType: 'webcam'
+            });
+            
+            arToolkitSource.init(() => {
+                setTimeout(() => {
+                    permissionPrompt.style.display = 'none';
+                    arToolkitSource.onResizeElement();
+                    arToolkitSource.copyElementSizeTo(renderer.domElement);
+                    
+                    // Create the atom after camera is initialized
+                    createAtom();
+                }, 500);
+            });
+        }
+        
+        // Event listener for camera button
+        enableCameraBtn.addEventListener('click', () => {
+            initCamera();
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Update AR scene if context is ready
+            if (arToolkitContext.ready) {
+                arToolkitContext.update(arToolkitContext.arController.canvas);
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
     </script>
-  </body>
+</body>
 </html>
