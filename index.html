@@ -1,71 +1,210 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Hydrogen Atom AR</title>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <style>
-    .arjs-loader {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydrogen Atom AR Visualization</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .arjs-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            transition: opacity 0.5s;
+        }
+        
+        .arjs-loader h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 300;
+            color: #4fc3f7;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #4fc3f7;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            z-index: 10;
+            font-size: 14px;
+        }
+        
+        .atom-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+            z-index: 10;
+        }
+        
+        .atom-info h3 {
+            margin-top: 0;
+            color: #4fc3f7;
+            border-bottom: 1px solid #4fc3f7;
+            padding-bottom: 5px;
+        }
+        
+        .atom-info ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        
+        .atom-info li {
+            margin-bottom: 8px;
+        }
+        
+        .atom-info strong {
+            color: #81d4fa;
+        }
+    </style>
 </head>
-<body style="margin: 0; overflow: hidden;">
-  <div class="arjs-loader">
-    <h1>Loading AR experience...</h1>
-    <p>Point camera at a marker</p>
-  </div>
+<body>
+    <div class="arjs-loader">
+        <div class="loading-spinner"></div>
+        <h1>Loading Hydrogen Atom AR Experience</h1>
+        <p>Please wait while we set up the quantum world...</p>
+    </div>
 
-  <a-scene
-    vr-mode-ui="enabled: false"
-    arjs="sourceType: webcam; debugUIEnabled: false;"
-    renderer="alpha: true;"
-  >
-    <a-assets>
-      <a-mixin id="nucleus" geometry="primitive: sphere; radius: 0.2" material="color: #3498db"></a-mixin>
-      <a-mixin id="electron" geometry="primitive: sphere; radius: 0.05" material="color: #e74c3c"></a-mixin>
-      <a-mixin id="orbit-path" material="color: white; opacity: 0.7; wireframe: true; transparent: true"></a-mixin>
-    </a-assets>
+    <div class="atom-info">
+        <h3>Hydrogen Atom Structure</h3>
+        <ul>
+            <li><strong>Nucleus:</strong> Single proton (shown as blue sphere)</li>
+            <li><strong>Electron:</strong> Orbiting particle (shown as red sphere)</li>
+            <li><strong>Orbital:</strong> Path of electron (white circle)</li>
+            <li><strong>Scale:</strong> Orbit radius exaggerated for visibility</li>
+        </ul>
+    </div>
 
-    <!-- Hiro marker -->
-    <a-marker type="pattern" preset="hiro">
-      <!-- Nucleus (combined proton/neutron) -->
-      <a-entity mixin="nucleus"></a-entity>
+    <div class="instructions">
+        Point your camera at a flat surface. After scanning, the hydrogen atom will appear.
+    </div>
 
-      <!-- Orbital path -->
-      <a-entity id="orbit" radius="1">
-        <a-circle 
-          mixin="orbit-path"
-          position="0 0 0"
-          rotation="-90 0 0"
-          radius="1"
-        ></a-circle>
-      </a-entity>
+    <a-scene 
+        vr-mode-ui="enabled: false" 
+        arjs="sourceType: webcam; detectionMode: mono; maxDetectionRate: 30;"
+        renderer="logarithmicDepthBuffer: true; precision: medium;"
+    >
+        <a-assets>
+            <!-- Define materials for our atom components -->
+            <a-mixin id="nucleus" geometry="primitive: sphere; radius: 0.15" 
+                     material="color: #2196F3; shader: flat"></a-mixin>
+            <a-mixin id="electron" geometry="primitive: sphere; radius: 0.06" 
+                     material="color: #F44336; shader: flat"></a-mixin>
+        </a-assets>
 
-      <!-- Electron -->
-      <a-entity id="electron-orbiter" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000">
-        <a-entity id="electron-entity" mixin="electron" position="1 0 0"></a-entity>
-      </a-entity>
-    </a-marker>
+        <!-- AR Marker (using Hiro pattern) -->
+        <a-marker preset="hiro">
+            <!-- Nucleus (proton) -->
+            <a-entity mixin="nucleus" position="0 0.5 0"></a-entity>
+            
+            <!-- Orbital path -->
+            <a-entity id="orbital" radius="0.8">
+                <a-entity id="orbit-path" position="0 0.5 0"></a-entity>
+            </a-entity>
+            
+            <!-- Electron orbiting the nucleus -->
+            <a-entity id="electron-entity" mixin="electron" position="0.8 0.5 0">
+                <a-animation attribute="rotation"
+                             dur="4000"
+                             easing="linear"
+                             to="0 360 0"
+                             repeat="indefinite"></a-animation>
+            </a-entity>
+        </a-marker>
+        
+        <!-- Camera setup -->
+        <a-entity camera></a-entity>
+    </a-scene>
 
-    <a-entity camera></a-entity>
-  </a-scene>
-
-  <script>
-    document.querySelector('a-scene').addEventListener('loaded', () => {
-      document.querySelector('.arjs-loader').style.display = 'none';
-    });
-  </script>
+    <script>
+        // Hide loader when scene is loaded
+        document.querySelector('a-scene').addEventListener('loaded', function() {
+            setTimeout(function() {
+                document.querySelector('.arjs-loader').style.opacity = '0';
+                setTimeout(function() {
+                    document.querySelector('.arjs-loader').style.display = 'none';
+                }, 500);
+            }, 1500);
+            
+            // Create the orbital path
+            const orbital = document.getElementById('orbital');
+            const radius = orbital.getAttribute('radius');
+            
+            // Create the circular orbital path
+            const orbitPath = document.getElementById('orbit-path');
+            const segments = 64;
+            let points = '';
+            
+            for (let i = 0; i <= segments; i++) {
+                const theta = (i / segments) * Math.PI * 2;
+                const x = radius * Math.cos(theta);
+                const z = radius * Math.sin(theta);
+                points += x + ' 0 ' + z + ', ';
+            }
+            
+            // Remove the last comma and space
+            points = points.slice(0, -2);
+            
+            // Set the line component
+            orbitPath.setAttribute('line', {
+                points: points,
+                color: 'white',
+                opacity: 0.7,
+                lineType: 'line',
+                loop: true
+            });
+            
+            // Create animation for electron to follow the orbital path
+            const electron = document.getElementById('electron-entity');
+            electron.setAttribute('animation', {
+                property: 'position',
+                dur: 4000,
+                easing: 'linear',
+                loop: true,
+                to: `${radius} 0.5 0`,
+                from: `${-radius} 0.5 0`
+            });
+        });
+    </script>
 </body>
 </html>
