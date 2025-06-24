@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Hydrogen Atom AR - iPhone XR</title>
+    <title>Hydrogen Atom AR Experience</title>
     <script src="https://cdn.jsdelivr.net/npm/ar.js@1.6.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
@@ -16,9 +16,9 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            background: linear-gradient(135deg, #0c1e27, #1a3340, #203a43);
             color: #fff;
-            height: 100vh;
+            min-height: 100vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -29,7 +29,6 @@
             text-align: center;
             padding: 15px 20px;
             background: rgba(0, 20, 40, 0.85);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             z-index: 10;
             position: relative;
         }
@@ -170,7 +169,7 @@
             padding: 10px;
         }
         
-        .permission-prompt {
+        .loading-overlay {
             position: absolute;
             top: 0;
             left: 0;
@@ -187,35 +186,39 @@
             backdrop-filter: blur(5px);
         }
         
-        .permission-prompt h2 {
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(79, 172, 254, 0.3);
+            border-top: 5px solid #00f2fe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-overlay h2 {
             color: #00f2fe;
             font-size: 1.5rem;
             margin-bottom: 15px;
         }
         
-        .permission-prompt p {
+        .loading-overlay p {
             max-width: 500px;
             margin-bottom: 20px;
             font-size: 1rem;
             line-height: 1.5;
         }
         
-        .btn {
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            color: #0f2027;
-            border: none;
-            padding: 12px 35px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            cursor: pointer;
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 10px;
             font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            display: none;
         }
         
         .footer {
@@ -277,11 +280,6 @@
                 width: 130px;
                 height: 130px;
             }
-            
-            .btn {
-                padding: 12px 30px;
-                font-size: 1rem;
-            }
         }
         
         /* Landscape mode */
@@ -309,17 +307,17 @@
 <body>
     <div class="header">
         <h1>Hydrogen Atom AR</h1>
-        <p class="subtitle">Visualize atomic structure on iPhone XR</p>
+        <p class="subtitle">Interactive Augmented Reality Experience</p>
     </div>
     
     <div class="container">
         <div class="ar-container">
             <div id="arScene"></div>
-            <div class="permission-prompt" id="permissionPrompt">
-                <h2>Camera Access Required</h2>
-                <p>To view the hydrogen atom in AR, we need access to your camera. This will allow us to detect markers and display the 3D atom.</p>
-                <p>No images or video are stored - processing happens in real-time.</p>
-                <button class="btn" id="enableCamera">Enable Camera</button>
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-spinner"></div>
+                <h2>Initializing AR Experience</h2>
+                <p>Loading atom model and requesting camera access...</p>
+                <div class="error-message" id="errorMessage"></div>
             </div>
         </div>
         
@@ -330,7 +328,7 @@
                 <div class="step">
                     <div class="step-number">1</div>
                     <h3>Enable Camera</h3>
-                    <p>Tap the button to grant camera access when prompted</p>
+                    <p>Allow camera access when prompted by your browser</p>
                 </div>
                 
                 <div class="step">
@@ -372,8 +370,8 @@
 
     <script>
         // Get DOM elements
-        const permissionPrompt = document.getElementById('permissionPrompt');
-        const enableCameraBtn = document.getElementById('enableCamera');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const errorMessage = document.getElementById('errorMessage');
         const arScene = document.getElementById('arScene');
         
         // Initialize Three.js scene
@@ -394,7 +392,10 @@
         // AR context
         const arToolkitContext = new THREEx.ArToolkitContext({
             cameraParametersUrl: 'https://arjs-cors-proxy.herokuapp.com/https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/camera_para.dat',
-            detectionMode: 'mono'
+            detectionMode: 'mono',
+            maxDetectionRate: 60,
+            canvasWidth: window.innerWidth,
+            canvasHeight: window.innerHeight
         });
         
         // Initialize AR context
@@ -409,7 +410,8 @@
         // Marker controls
         const markerControls = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
             type: 'pattern',
-            patternUrl: 'https://arjs-cors-proxy.herokuapp.com/https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/hiro.patt'
+            patternUrl: 'https://arjs-cors-proxy.herokuapp.com/https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/hiro.patt',
+            changeMatrixMode: 'cameraTransformMatrix'
         });
         
         // Create atom function
@@ -483,39 +485,34 @@
             }
             
             animateElectron();
+            
+            // Hide loading overlay after a short delay
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 1000);
         }
         
-        // Camera initialization
-        function initCamera() {
+        // Initialize AR source and camera
+        function initAR() {
             const arToolkitSource = new THREEx.ArToolkitSource({
                 sourceType: 'webcam'
             });
             
             arToolkitSource.init(() => {
-                setTimeout(() => {
-                    permissionPrompt.style.display = 'none';
-                    arToolkitSource.onResizeElement();
-                    arToolkitSource.copyElementSizeTo(renderer.domElement);
-                    
-                    // Create the atom after camera is initialized
-                    createAtom();
-                }, 500);
+                arToolkitSource.onResizeElement();
+                arToolkitSource.copyElementSizeTo(renderer.domElement);
+                
+                // Create the atom
+                createAtom();
             });
             
-            // Handle errors
-            arToolkitSource.domElement.addEventListener('error', () => {
-                permissionPrompt.innerHTML = `
-                    <h2>Camera Error</h2>
-                    <p>Could not access your camera. Please ensure you've granted permission and that no other app is using your camera.</p>
-                    <button class="btn" onclick="location.reload()">Try Again</button>
-                `;
+            // Handle camera errors
+            arToolkitSource.domElement.addEventListener('error', (event) => {
+                console.error('Camera error:', event);
+                errorMessage.textContent = 'Camera access denied. Please allow camera permission and reload the page.';
+                errorMessage.style.display = 'block';
             });
         }
-        
-        // Event listener for camera button
-        enableCameraBtn.addEventListener('click', () => {
-            initCamera();
-        });
         
         // Handle window resize
         function handleResize() {
@@ -526,8 +523,8 @@
             camera.updateProjectionMatrix();
             renderer.setSize(width, height);
             
-            if (arToolkitSource) {
-                arToolkitSource.copyElementSizeTo(renderer.domElement);
+            if (arToolkitContext.arController) {
+                arToolkitContext.arController.setPatternDetectionSize(0.75);
             }
         }
         
@@ -543,13 +540,24 @@
             
             // Update AR scene if context is ready
             if (arToolkitContext.ready) {
-                arToolkitContext.update(arToolkitContext.arController.canvas);
+                arToolkitContext.update(arToolkitSource.domElement);
             }
             
             renderer.render(scene, camera);
         }
         
-        animate();
+        // Start AR experience
+        document.addEventListener('DOMContentLoaded', () => {
+            // Try to initialize AR automatically
+            try {
+                initAR();
+                animate();
+            } catch (error) {
+                errorMessage.textContent = 'Error initializing AR: ' + error.message;
+                errorMessage.style.display = 'block';
+                console.error('AR initialization error:', error);
+            }
+        });
         
         // iPhone XR specific optimizations
         if (navigator.userAgent.match(/iPhone/)) {
