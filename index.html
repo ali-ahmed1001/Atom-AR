@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Hydrogen Atom AR</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
@@ -17,7 +17,10 @@
             background: #000;
             overflow: hidden;
             height: 100vh;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            /* Safe area padding for iPhone X notch */
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) 
+                     env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         
         .arjs-loader {
@@ -34,6 +37,9 @@
             align-items: center;
             color: white;
             transition: opacity 0.5s ease;
+            /* Adjust for notch */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         .loader-spinner {
@@ -55,6 +61,8 @@
             font-size: 1.8rem;
             margin-bottom: 15px;
             color: #64b5f6;
+            text-align: center;
+            padding: 0 20px;
         }
         
         .arjs-loader p {
@@ -63,28 +71,69 @@
             text-align: center;
             line-height: 1.6;
             color: #e0e0e0;
+            padding: 0 20px;
         }
         
         a-scene {
             width: 100%;
             height: 100%;
+            /* Ensure it fills the entire viewport */
+            position: fixed;
+            top: 0;
+            left: 0;
         }
         
         .minimal-tip {
             position: absolute;
-            bottom: 20px;
+            bottom: calc(20px + env(safe-area-inset-bottom));
             left: 0;
             width: 100%;
             text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
             z-index: 10;
             pointer-events: none;
+            padding: 0 20px;
+            /* Add background for better readability */
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 15px;
+            max-width: 90%;
+            margin: 0 auto;
         }
         
+        /* iPhone XR specific adjustments */
+        @media only screen 
+          and (device-width: 414px) 
+          and (device-height: 896px) 
+          and (-webkit-device-pixel-ratio: 2) {
+            .arjs-loader h2 {
+                font-size: 1.6rem;
+            }
+            
+            .arjs-loader p {
+                font-size: 1rem;
+            }
+            
+            .minimal-tip {
+                font-size: 15px;
+                bottom: calc(30px + env(safe-area-inset-bottom));
+            }
+        }
+        
+        /* General mobile adjustments */
         @media (max-width: 768px) {
             .minimal-tip {
-                font-size: 12px;
+                font-size: 14px;
+                bottom: calc(15px + env(safe-area-inset-bottom));
+            }
+            
+            .arjs-loader h2 {
+                font-size: 1.5rem;
+            }
+            
+            .arjs-loader p {
+                font-size: 0.95rem;
             }
         }
     </style>
@@ -100,7 +149,7 @@
 
     <a-scene
         vr-mode-ui="enabled: false"
-        arjs="sourceType: webcam; debugUIEnabled: false;"
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
         renderer="antialias: true; alpha: true;"
     >
         <a-assets>
@@ -156,7 +205,8 @@
 
     <script>
         // Hide loader when scene is loaded
-        document.querySelector('a-scene').addEventListener('loaded', () => {
+        const scene = document.querySelector('a-scene');
+        scene.addEventListener('loaded', () => {
             document.querySelector('.arjs-loader').style.opacity = 0;
             setTimeout(() => {
                 document.querySelector('.arjs-loader').style.display = 'none';
@@ -173,7 +223,6 @@
         });
         
         // Hide tip when marker is found
-        const scene = document.querySelector('a-scene');
         scene.addEventListener('markerFound', () => {
             document.querySelector('.minimal-tip').style.opacity = 0;
         });
@@ -182,6 +231,21 @@
         scene.addEventListener('markerLost', () => {
             document.querySelector('.minimal-tip').style.opacity = 1;
         });
+        
+        // iOS-specific fixes
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+            // Force user interaction to enable audio/video
+            document.body.addEventListener('touchstart', function() {
+                // This empty handler enables audio/video on iOS
+            }, { once: true });
+            
+            // Handle iOS orientation changes
+            window.addEventListener('orientationchange', function() {
+                setTimeout(() => {
+                    window.dispatchEvent(new Event('resize'));
+                }, 500);
+            });
+        }
     </script>
 </body>
 </html>
