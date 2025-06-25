@@ -1,89 +1,316 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Hydrogen Atom AR</title>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <style>
-    .arjs-loader {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydrogen Atom AR Visualization</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+        
+        .content {
+            display: flex;
+            flex: 1;
+        }
+        
+        .info-panel {
+            width: 300px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+        }
+        
+        .info-panel h2 {
+            margin-bottom: 20px;
+            color: #64b5f6;
+            font-size: 1.8rem;
+        }
+        
+        .atom-info {
+            margin-bottom: 30px;
+        }
+        
+        .atom-info h3 {
+            color: #4fc3f7;
+            margin: 15px 0 10px;
+        }
+        
+        .atom-info p {
+            line-height: 1.6;
+            margin-bottom: 10px;
+            color: #e0e0e0;
+        }
+        
+        .instructions {
+            background: rgba(33, 150, 243, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .instructions h3 {
+            color: #29b6f6;
+            margin-top: 0;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .ar-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        .arjs-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        .loader-spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #2196f3;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .arjs-loader h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #64b5f6;
+        }
+        
+        .arjs-loader p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            text-align: center;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+        
+        a-scene {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .info-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                max-height: 300px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
-<body style="margin: 0; overflow: hidden;">
-  <div class="arjs-loader">
-    <h1>Loading AR experience...</h1>
-    <p>Point camera at a marker</p>
-  </div>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Hydrogen Atom Augmented Reality</h1>
+            <p>Visualize the simplest atom in the universe with its nucleus and orbiting electron in augmented reality</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-panel">
+                <h2>Hydrogen Atom Structure</h2>
+                
+                <div class="atom-info">
+                    <h3>The Simplest Atom</h3>
+                    <p>The hydrogen atom is the simplest and most abundant atom in the universe, consisting of just one proton and one electron.</p>
+                    
+                    <h3>Nucleus</h3>
+                    <p>At the center of the atom is the nucleus, which contains a single proton (shown in blue).</p>
+                    
+                    <h3>Electron Orbit</h3>
+                    <p>The electron (shown in red) orbits the nucleus at high speed along a specific path called an orbital.</p>
+                    
+                    <h3>Quantum Nature</h3>
+                    <p>In reality, electrons don't orbit like planets but exist in probability clouds. This visualization simplifies the concept for educational purposes.</p>
+                </div>
+                
+                <div class="instructions">
+                    <h3>How to Use This AR Experience</h3>
+                    <ul>
+                        <li>Allow camera access when prompted</li>
+                        <li>Point your camera at a flat, well-lit surface</li>
+                        <li>Look for the Hiro marker pattern on your second screen or print it out</li>
+                        <li>Point your camera at the marker to see the hydrogen atom</li>
+                        <li>Move around the atom to view it from different angles</li>
+                    </ul>
+                    <p><strong>Note:</strong> The electron orbits the nucleus every 4 seconds in this visualization.</p>
+                </div>
+            </div>
+            
+            <div class="ar-container">
+                <div class="arjs-loader">
+                    <div class="loader-spinner"></div>
+                    <h2>Loading AR Experience</h2>
+                    <p>Please wait while we prepare your augmented reality experience. This may take a moment...</p>
+                    <p>Once loaded, point your camera at the Hiro marker to view the hydrogen atom.</p>
+                </div>
+                
+                <a-scene
+                    vr-mode-ui="enabled: false"
+                    arjs="sourceType: webcam; debugUIEnabled: false;"
+                    renderer="antialias: true; alpha: true;"
+                >
+                    <a-assets>
+                        <a-mixin id="nucleus" geometry="primitive: sphere; radius: 0.2" material="color: #3498db; metalness: 0.5; roughness: 0.1"></a-mixin>
+                        <a-mixin id="electron" geometry="primitive: sphere; radius: 0.05" material="color: #e74c3c; emissive: #e74c3c; emissiveIntensity: 0.8"></a-mixin>
+                        <a-mixin id="orbit-path" material="color: #ecf0f1; opacity: 0.4; transparent: true"></a-mixin>
+                    </a-assets>
 
-  <a-scene
-    vr-mode-ui="enabled: false"
-    arjs="sourceType: webcam; debugUIEnabled: false;"
-    renderer="alpha: true;"
-  >
-    <a-assets>
-      <a-mixin id="nucleus" geometry="primitive: sphere; radius: 0.2" material="color: #3498db"></a-mixin>
-      <a-mixin id="electron" geometry="primitive: sphere; radius: 0.05" material="color: #e74c3c"></a-mixin>
-      <a-mixin id="orbit-path" material="color: white; opacity: 0.7; wireframe: true; transparent: true"></a-mixin>
-    </a-assets>
+                    <!-- Hiro marker with helpers disabled -->
+                    <a-marker 
+                        type="pattern" 
+                        preset="hiro"
+                        markerhelpers="disableAxis: true; disablePattern: true"
+                        axis="false"
+                        debug="false"
+                    >
+                        <!-- Nucleus -->
+                        <a-entity mixin="nucleus" position="0 0 0"></a-entity>
 
-    <!-- Hiro marker with all helpers disabled -->
-    <a-marker 
-      type="pattern" 
-      preset="hiro" 
-      emitevents="true" 
-      cursor="rayOrigin: mouse"
-      raycaster="objects: .clickable"
-      axis="false" 
-      debug="false"
-    >
-      <!-- Nucleus (combined proton/neutron) -->
-      <a-entity mixin="nucleus"></a-entity>
+                        <!-- Orbital path - using torus for a cleaner orbit ring -->
+                        <a-torus 
+                            id="orbit-ring"
+                            mixin="orbit-path"
+                            radius="1"
+                            radius-tubular="0.005"
+                            rotation="-90 0 0"
+                            position="0 0 0"
+                        ></a-torus>
 
-      <!-- Orbital path -->
-      <a-entity id="orbit" radius="1">
-        <a-circle 
-          mixin="orbit-path"
-          position="0 0 0"
-          rotation="-90 0 0"
-          radius="1"
-        ></a-circle>
-      </a-entity>
+                        <!-- Electron orbiting the nucleus -->
+                        <a-entity 
+                            id="electron-orbiter" 
+                            animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear"
+                        >
+                            <a-entity 
+                                id="electron-entity" 
+                                mixin="electron" 
+                                position="1 0 0"
+                                animation="property: scale; dir: alternate; dur: 1000; loop: true; to: 1.5 1.5 1.5; easing: easeInOutQuad"
+                            ></a-entity>
+                        </a-entity>
+                    </a-marker>
+                    
+                    <!-- Camera -->
+                    <a-entity camera></a-entity>
+                    
+                    <!-- Ambient light -->
+                    <a-entity light="type: ambient; color: #aaa; intensity: 0.8"></a-entity>
+                    
+                    <!-- Directional light -->
+                    <a-entity light="type: directional; color: #ffffff; intensity: 0.8" position="-1 1 1"></a-entity>
+                </a-scene>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Hydrogen Atom AR Visualization | Created with A-Frame and AR.js | Educational Physics Experience</p>
+        </div>
+    </div>
 
-      <!-- Electron -->
-      <a-entity id="electron-orbiter" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000">
-        <a-entity id="electron-entity" mixin="electron" position="1 0 0"></a-entity>
-      </a-entity>
-    </a-marker>
-
-    <!-- Add camera with marker helpers disabled -->
-    <a-entity camera></a-entity>
-  </a-scene>
-
-  <script>
-    // Hide loader when scene is loaded
-    document.querySelector('a-scene').addEventListener('loaded', () => {
-      document.querySelector('.arjs-loader').style.display = 'none';
-      
-      // Programmatically disable marker helpers
-      const marker = document.querySelector('a-marker');
-      marker.setAttribute('markerhelpers', {
-        disableAll: true,
-        disablePattern: true,
-        disableAxis: true
-      });
-    });
-  </script>
+    <script>
+        // Hide loader when scene is loaded
+        document.querySelector('a-scene').addEventListener('loaded', () => {
+            document.querySelector('.arjs-loader').style.display = 'none';
+        });
+        
+        // Add a slight glow effect to the electron
+        setTimeout(() => {
+            const electron = document.getElementById('electron-entity');
+            if (electron) {
+                electron.setAttribute('material', 'emissive', '#ff5252');
+                electron.setAttribute('material', 'emissiveIntensity', 1);
+            }
+        }, 2000);
+    </script>
 </body>
 </html>
