@@ -180,6 +180,46 @@
             font-weight: 500;
         }
         
+        /* Release button container */
+        .release-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .release-control.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .release-button {
+            background: rgba(220, 53, 69, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .release-button:hover {
+            background: rgba(220, 53, 69, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .release-button:active {
+            transform: translateY(0);
+        }
+        
         /* iPhone XR specific adjustments */
         @media only screen 
           and (device-width: 414px) 
@@ -201,6 +241,11 @@
             .scale-control {
                 bottom: 120px;
             }
+            
+            .release-control {
+                top: calc(20px + env(safe-area-inset-top));
+                right: 15px;
+            }
         }
         
         /* General mobile adjustments */
@@ -220,6 +265,16 @@
             
             .scale-control {
                 bottom: 90px;
+            }
+            
+            .release-control {
+                top: calc(15px + env(safe-area-inset-top));
+                right: 15px;
+            }
+            
+            .release-button {
+                padding: 10px 20px;
+                font-size: 14px;
             }
         }
         
@@ -248,6 +303,11 @@
             <div class="scale-value">Size: <span id="scaleValue">0.3</span></div>
         </div>
     </div>
+    
+    <!-- Release button container -->
+    <div class="release-control" id="releaseControl">
+        <button class="release-button" id="releaseButton">Release Model</button>
+    </div>
 
     <a-scene
         vr-mode-ui="enabled: false"
@@ -274,11 +334,13 @@
 
         <!-- Hiro marker with helpers disabled -->
         <a-marker 
+            id="marker"
             type="pattern" 
             preset="hiro"
             markerhelpers="disableAxis: true; disablePattern: true"
             axis="false"
             debug="false"
+            emitevents="true"
         >
             <!-- 
             ====================================================================
@@ -356,7 +418,13 @@
         const scaleSlider = document.getElementById('scaleSlider');
         const scaleValue = document.getElementById('scaleValue');
         const scaleControl = document.getElementById('scaleControl');
+        const releaseControl = document.getElementById('releaseControl');
+        const releaseButton = document.getElementById('releaseButton');
         const tipElement = document.querySelector('.minimal-tip');
+        
+        // Variables to track model state
+        let modelPlaced = false;
+        let modelVisible = false;
         
         // Hide loader when scene is loaded
         scene.addEventListener('loaded', () => {
@@ -366,16 +434,26 @@
             }, 500);
         });
         
-        // Hide tip and show scale slider when marker is found
+        // When marker is found - show controls and hide tip
         scene.addEventListener('markerFound', () => {
             tipElement.style.opacity = 0;
             scaleControl.classList.add('active');
+            releaseControl.classList.add('active');
+            modelVisible = true;
         });
         
-        // Show tip and hide scale slider when marker is lost
+        // When marker is lost - keep model visible but hide scale control
+        // Only hide the model if it hasn't been placed yet
         scene.addEventListener('markerLost', () => {
-            tipElement.style.opacity = 1;
-            scaleControl.classList.remove('active');
+            if (!modelPlaced) {
+                tipElement.style.opacity = 1;
+                scaleControl.classList.remove('active');
+                releaseControl.classList.remove('active');
+                modelVisible = false;
+            } else {
+                // Keep release button visible even when marker is lost
+                releaseControl.classList.add('active');
+            }
         });
         
         // Update model scale when slider value changes
@@ -387,6 +465,45 @@
                 // Apply the same scale to all axes to maintain proportions
                 modelEntity.setAttribute('scale', `${scale} ${scale} ${scale}`);
                 scaleValue.textContent = scale;
+            }
+        });
+        
+        // Release/clear model when button is clicked
+        releaseButton.addEventListener('click', function() {
+            if (modelPlaced) {
+                // Reset the model state
+                modelPlaced = false;
+                modelVisible = false;
+                
+                // Hide the release button
+                releaseControl.classList.remove('active');
+                
+                // Show the tip again
+                tipElement.style.opacity = 1;
+                
+                // Reset the marker to allow new detection
+                const marker = document.getElementById('marker');
+                if (marker) {
+                    marker.setAttribute('visible', 'true');
+                }
+                
+                // Optional: Reset model position/scale if needed
+                // const modelEntity = document.getElementById('model-entity');
+                // if (modelEntity) {
+                //     modelEntity.setAttribute('position', '0 0.5 0');
+                //     modelEntity.setAttribute('scale', '0.3 0.3 0.3');
+                //     modelEntity.setAttribute('rotation', '0 45 0');
+                // }
+            } else {
+                // Place the model (make it persistent)
+                modelPlaced = true;
+                this.textContent = "Clear Model";
+                
+                // Hide the scale control since model is now placed
+                scaleControl.classList.remove('active');
+                
+                // Keep the release button visible
+                releaseControl.classList.add('active');
             }
         });
         
