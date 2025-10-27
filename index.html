@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Hydrogen Atom AR</title>
+    <title>Custom 3D Model AR</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -141,11 +141,11 @@
 <body>
     <div class="arjs-loader">
         <div class="loader-spinner"></div>
-        <h2>Loading Hydrogen Atom AR</h2>
+        <h2>Loading Custom 3D Model AR</h2>
         <p>Point your camera at the Hiro marker when loaded</p>
     </div>
     
-    <div class="minimal-tip">Point camera at Hiro marker to see hydrogen atom</div>
+    <div class="minimal-tip">Point camera at Hiro marker to see your 3D model</div>
 
     <a-scene
         vr-mode-ui="enabled: false"
@@ -153,9 +153,21 @@
         renderer="antialias: true; alpha: true;"
     >
         <a-assets>
-            <a-mixin id="nucleus" geometry="primitive: sphere; radius: 0.2" material="color: #3498db; metalness: 0.7; roughness: 0.1"></a-mixin>
-            <a-mixin id="electron" geometry="primitive: sphere; radius: 0.05" material="color: #e74c3c; emissive: #e74c3c; emissiveIntensity: 0.8"></a-mixin>
-            <a-mixin id="orbit-path" material="color: #ecf0f1; opacity: 0.3; transparent: true"></a-mixin>
+            <!-- 
+            ====================================================================
+            ADD YOUR CUSTOM 3D MODEL HERE
+            Replace the example URL with your GitHub Pages model URL
+            Supported formats: .gltf, .glb, .obj, .mtl, etc.
+            
+            Example for GitHub Pages:
+            <a-asset-item id="my-model" src="https://yourusername.github.io/your-repository/models/your-model.gltf"></a-asset-item>
+            
+            If using OBJ/MTL:
+            <a-asset-item id="my-model-obj" src="https://yourusername.github.io/your-repository/models/your-model.obj"></a-asset-item>
+            <a-asset-item id="my-model-mtl" src="https://yourusername.github.io/your-repository/models/your-model.mtl"></a-asset-item>
+            ====================================================================
+            -->
+            <a-asset-item id="custom-model" src="https://raw.githubusercontent.com/ali-ahmed1001/Atom-AR/refs/heads/main/Sculpture_LongHat.glb"></a-asset-item>
         </a-assets>
 
         <!-- Hiro marker with helpers disabled -->
@@ -166,21 +178,51 @@
             axis="false"
             debug="false"
         >
+            <!-- 
+            ====================================================================
+            REPLACE THE ATOM MODEL WITH YOUR CUSTOM 3D MODEL HERE
+            
+            Remove or comment out the atom model components below and add your model.
+            Adjust position, scale, and rotation as needed for your model.
+            
+            For GLTF/GLB models use:
+            <a-entity gltf-model="#custom-model" position="0 0 0" scale="0.5 0.5 0.5" rotation="0 0 0"></a-entity>
+            
+            For OBJ/MTL models use:
+            <a-entity obj-model="obj: #my-model-obj; mtl: #my-model-mtl" position="0 0 0" scale="0.5 0.5 0.5" rotation="0 0 0"></a-entity>
+            
+            Example with current demo model (replace with your model):
+            ====================================================================
+            -->
+            <a-entity 
+                gltf-model="#custom-model" 
+                position="0 0.5 0" 
+                scale="0.3 0.3 0.3" 
+                rotation="0 45 0"
+                animation="property: rotation; to: 0 405 0; loop: true; dur: 8000; easing: linear"
+            ></a-entity>
+
+            <!-- 
+            ====================================================================
+            ORIGINAL ATOM MODEL - COMMENTED OUT
+            Remove the comment tags if you want to keep the atom as background
+            or remove completely to only show your custom model
+            
             <!-- Nucleus -->
-            <a-entity mixin="nucleus" position="0 0 0"></a-entity>
+            <!-- <a-entity mixin="nucleus" position="0 0 0"></a-entity> -->
 
             <!-- Orbital path - thin ring -->
-            <a-torus 
+            <!-- <a-torus 
                 id="orbit-ring"
                 mixin="orbit-path"
                 radius="1"
                 radius-tubular="0.003"
                 rotation="-90 0 0"
                 position="0 0 0"
-            ></a-torus>
+            ></a-torus> -->
 
             <!-- Electron orbiting the nucleus -->
-            <a-entity 
+            <!-- <a-entity 
                 id="electron-orbiter" 
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 4000; easing: linear"
             >
@@ -190,7 +232,9 @@
                     position="1 0 0"
                     animation="property: scale; dir: alternate; dur: 1000; loop: true; to: 1.5 1.5 1.5; easing: easeInOutQuad"
                 ></a-entity>
-            </a-entity>
+            </a-entity> -->
+            ====================================================================
+            -->
         </a-marker>
         
         <!-- Camera -->
@@ -211,15 +255,6 @@
             setTimeout(() => {
                 document.querySelector('.arjs-loader').style.display = 'none';
             }, 500);
-            
-            // Add glow to electron after a delay
-            setTimeout(() => {
-                const electron = document.getElementById('electron-entity');
-                if (electron) {
-                    electron.setAttribute('material', 'emissive', '#ff5252');
-                    electron.setAttribute('material', 'emissiveIntensity', 1);
-                }
-            }, 2000);
         });
         
         // Hide tip when marker is found
