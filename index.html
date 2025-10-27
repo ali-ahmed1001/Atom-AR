@@ -100,6 +100,84 @@
             border-radius: 15px;
             max-width: 90%;
             margin: 0 auto;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Scale slider container */
+        .scale-control {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .scale-control.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .scale-slider-container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 15px 20px;
+            width: 80%;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .scale-label {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .scale-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #4a4a4a;
+            outline: none;
+        }
+        
+        .scale-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #2196f3;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .scale-slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #2196f3;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .scale-value {
+            color: white;
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 500;
         }
         
         /* iPhone XR specific adjustments */
@@ -119,6 +197,10 @@
                 font-size: 15px;
                 bottom: calc(30px + env(safe-area-inset-bottom));
             }
+            
+            .scale-control {
+                bottom: 120px;
+            }
         }
         
         /* General mobile adjustments */
@@ -135,6 +217,17 @@
             .arjs-loader p {
                 font-size: 0.95rem;
             }
+            
+            .scale-control {
+                bottom: 90px;
+            }
+        }
+        
+        /* Small screen adjustments */
+        @media (max-height: 700px) {
+            .scale-control {
+                bottom: 80px;
+            }
         }
     </style>
 </head>
@@ -146,6 +239,15 @@
     </div>
     
     <div class="minimal-tip">Point camera at Hiro marker to see your 3D model</div>
+    
+    <!-- Scale slider container -->
+    <div class="scale-control" id="scaleControl">
+        <div class="scale-slider-container">
+            <div class="scale-label">Adjust Model Size</div>
+            <input type="range" min="0.1" max="2" step="0.05" value="0.3" class="scale-slider" id="scaleSlider">
+            <div class="scale-value">Size: <span id="scaleValue">0.3</span></div>
+        </div>
+    </div>
 
     <a-scene
         vr-mode-ui="enabled: false"
@@ -195,6 +297,7 @@
             ====================================================================
             -->
             <a-entity 
+                id="model-entity"
                 gltf-model="#custom-model" 
                 position="0 0.5 0" 
                 scale="0.3 0.3 0.3" 
@@ -248,8 +351,14 @@
     </a-scene>
 
     <script>
-        // Hide loader when scene is loaded
+        // Get DOM elements
         const scene = document.querySelector('a-scene');
+        const scaleSlider = document.getElementById('scaleSlider');
+        const scaleValue = document.getElementById('scaleValue');
+        const scaleControl = document.getElementById('scaleControl');
+        const tipElement = document.querySelector('.minimal-tip');
+        
+        // Hide loader when scene is loaded
         scene.addEventListener('loaded', () => {
             document.querySelector('.arjs-loader').style.opacity = 0;
             setTimeout(() => {
@@ -257,14 +366,28 @@
             }, 500);
         });
         
-        // Hide tip when marker is found
+        // Hide tip and show scale slider when marker is found
         scene.addEventListener('markerFound', () => {
-            document.querySelector('.minimal-tip').style.opacity = 0;
+            tipElement.style.opacity = 0;
+            scaleControl.classList.add('active');
         });
         
-        // Show tip when marker is lost
+        // Show tip and hide scale slider when marker is lost
         scene.addEventListener('markerLost', () => {
-            document.querySelector('.minimal-tip').style.opacity = 1;
+            tipElement.style.opacity = 1;
+            scaleControl.classList.remove('active');
+        });
+        
+        // Update model scale when slider value changes
+        scaleSlider.addEventListener('input', function() {
+            const scale = this.value;
+            const modelEntity = document.getElementById('model-entity');
+            
+            if (modelEntity) {
+                // Apply the same scale to all axes to maintain proportions
+                modelEntity.setAttribute('scale', `${scale} ${scale} ${scale}`);
+                scaleValue.textContent = scale;
+            }
         });
         
         // iOS-specific fixes
